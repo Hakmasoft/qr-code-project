@@ -99,7 +99,7 @@ Evergreen topic clips. One per topic. Do not change when the season changes.
 | `id` | uuid | Yes | Primary key | |
 | `topic` | text | Yes | Unique | Matches slug and form topic |
 | `title` | text | Yes | Internal label | For the CMS, not shown publicly |
-| `video_url` | text | Yes | Mux playback ID or URL | Playback source |
+| `video_url` | text | Yes | TikTok video URL or ID | Embed source |
 | `duration_seconds` | integer | No | Target ≤ 90 | For validation |
 | `surface_codes` | text[] | No | Array of slugs | Which slugs serve this clip |
 | `active` | boolean | Yes | Default `true` | |
@@ -108,6 +108,7 @@ Evergreen topic clips. One per topic. Do not change when the season changes.
 **Notes:**
 - One active clip per topic at a time. Versioning, if needed, is handled by adding a new row and deactivating the old one.
 - `surface_codes` is informational; the authoritative mapping is `slugs.topic`.
+- `video_url` stores a TikTok video URL or ID. The Hub embeds it using TikTok's official embed player. The Hub must never redirect the user to TikTok. See ADR-015.
 
 ## 7. Table: `season_ads`
 
@@ -117,7 +118,7 @@ Rotating invitations. One active at a time.
 |:---|:---|:---|:---|:---|
 | `id` | uuid | Yes | Primary key | |
 | `title` | text | Yes | Internal label | |
-| `video_url` | text | Yes | Mux playback ID or URL | Playback source |
+| `video_url` | text | Yes | TikTok video URL or ID | Embed source |
 | `invitation_copy` | text | Yes | Warm, specific | Text shown with or near the ad |
 | `active_from` | timestamp | Yes | | Start of active window |
 | `active_until` | timestamp | Yes | Must be > `active_from` | End of active window |
@@ -128,6 +129,7 @@ Rotating invitations. One active at a time.
 - The Hub queries for the row where `active = true` and `now()` is between `active_from` and `active_until`.
 - If no row matches, the Hub shows a fallback invitation (see Runbook).
 - Only one row should be active at any time. Enforce in application logic.
+- `video_url` stores a TikTok video URL or ID. The Hub embeds it using TikTok's official embed player. The Hub must never redirect the user to TikTok. See ADR-015.
 
 ## 8. Topic Tags
 

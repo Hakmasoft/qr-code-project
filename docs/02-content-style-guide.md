@@ -16,26 +16,26 @@ The single most important principle: **the surface determines the response.** Ev
 
 Each layer has a distinct job. Do not let one layer do another's work.
 
-## 3. The Core Rule: Surface = Human, Clip = Spiritual
+## 3. The Core Rule: Surface May Carry Scripture, Chosen Deliberately
 
-**Surfaces carry no explicitly religious vocabulary.**
+**Surfaces may carry scripture or religious reference.** This is not banned. The team has decided that a scriptural line, placed with intention, will minister to the person it is meant to reach.
 
-Banned words on surfaces (non-exhaustive):
-- Jesus, God, Christ, Lord, Savior
-- Salvation, saved, sin, repent, redemption
-- Church, gospel, scripture, Bible, verse
-- Faith, blessing, anointed, holy
-- Worship, prayer, preach
+**The guidance is not prohibition — it is deliberation.** Religious language can filter out some readers before curiosity works. It can also land with unusual force on the person who needed exactly that line. Both are true. So the rule is not "never" and not "always" — it is "choose on purpose."
 
-**Rationale:** Religious language triggers filtering before curiosity can work. The person categorizes the message as "religious material" and stops reading. A human line keeps the door open for two more seconds — which is all a scan needs.
+**Ask before placing scripture on a surface:**
+- Does this line fit the surface and the moment?
+- Is it the right tool here, or would a human line open the door wider?
+- Does the clip honor the line's promise?
 
-**The clip does the spiritual work.** That is where scripture, meaning, and the connection to Phaneroo appear. The surface is the doorway; the clip is the room.
+If the answer to all three is yes, scripture belongs on the surface. If not, use a human line.
+
+**The clip still does the deeper spiritual work.** The surface opens the door; the clip walks the person through it. This remains true whether the surface line is human or scriptural.
 
 **The clip must honor the surface's promise.** If the surface asks "Why does success feel empty?", the clip engages that question. No bait-and-switch.
 
 ## 4. Hook Styles
 
-Three styles, each matched to context. A surface line must be clearly one of these.
+Three styles, each matched to context. A surface line must be clearly one of these, whether it uses scripture or not.
 
 ### Question
 Best for: casual, high-traffic surfaces (cups, public cards)
@@ -55,29 +55,32 @@ Example: "There's a room full of people who get it. →"
 
 A surface line must be:
 
-- **Relatable** — names a real human experience
+- **Relatable** — names a real human experience, or a scriptural line the reader can recognize
 - **Specific** — feels true, not vague
 - **Unresolved** — creates a small gap the clip fills
-- **Free of religious vocabulary** — see banned list
 - **Short** — readable in 2 seconds
+- **Chosen deliberately** — human or scriptural, but not by accident
 
 A surface line must not be:
 
 - Clever for its own sake (clever loses to clear)
-- A slogan or a Bible verse
+- A slogan
 - A call to action like "Scan me"
 - Longer than two short lines
 
 ### Do / Don't Examples
 
-| Don't (religious-first) | Do (relatable-first) |
-|:---|:---|
-| "Jesus is the answer." | "You got the answer. Why does it still feel wrong?" |
-| "Repent and be saved." | "What if the thing you're ashamed of isn't the whole story?" |
-| "God loves you." | "What if you're not as alone as it feels at 2am?" |
-| "Come to church." | "There's a room full of people who get it. →" |
+Both columns are valid. The difference is deliberation, not category.
 
-Notice: the right column never says "God" or "Jesus" — but every line opens a door the clip can walk through.
+| Weak / careless | Strong / deliberate |
+|:---|:---|
+| "Jesus is the answer." (generic, filters out many) | "You got the answer. Why does it still feel wrong?" (human, relatable) |
+| "Repent and be saved." (generic, filters out many) | "What if the thing you're ashamed of isn't the whole story?" (human, relatable) |
+| "God loves you." (generic, filters out many) | "What if you're not as alone as it feels at 2am?" (human, relatable) |
+| "Come to church." (generic, filters out many) | "There's a room full of people who get it. →" (human, relatable) |
+| Any verse, pasted without thought | A verse chosen because it fits the surface and the moment |
+
+The right column is not "always human." It is "always chosen." A scriptural line, chosen with the same care, is equally valid.
 
 ## 6. QR Code Placement Rules
 
@@ -95,6 +98,7 @@ Notice: the right column never says "God" or "Jesus" — but every line opens a 
 - **Close:** transitions warmly into the season ad. Never breaks the mood.
 - **One clip per topic.** Clips are evergreen; they do not change when the season changes.
 - **Tone:** warm, honest, conversational. Not preachy, not salesy.
+- **Platform fit:** clips are produced for TikTok's format (vertical, 60–90 seconds, fast opening). They are embedded on the Hub, not linked out to TikTok.
 
 ## 8. Season Ad Rules
 
@@ -135,6 +139,7 @@ Same information. The first keeps the moment. The second breaks it.
 - **Warm, not preachy.** Invite, do not pressure.
 - **Honest.** No bait-and-switch between layers.
 - **Specific.** Vague lines convert nobody.
+- **Deliberate.** Whether human or scriptural, the line is chosen on purpose.
 - **Unresolved on the surface, resolved in the clip.**
 
 ## 11. Vocabulary Reference
@@ -142,18 +147,26 @@ Same information. The first keeps the moment. The second breaks it.
 ### Preferred words (human, warm)
 life, peace, purpose, rest, anxious, empty, alone, curious, real, honest, listen, welcome, room, people, story, question, next, now
 
-### Banned on surfaces (religious)
-God, Jesus, Christ, Lord, Savior, salvation, sin, repent, church, gospel, Bible, verse, faith, holy, worship, prayer, preach
+### Allowed on surfaces, with care
+The full range of scripture and ministry vocabulary is permitted on surfaces. It is not banned. Use it where it fits the surface, the moment, and the person it is meant to reach.
 
-### Allowed in clips and season ads
-The full range of scripture and ministry vocabulary is permitted in the clip and season ad. The restriction applies to surfaces only.
+Examples of scripture that may work well on a surface:
+- A short, striking verse that names a human experience
+- A line that raises a question the clip can answer
+- A phrase that carries weight without requiring context
+
+### Guidance, not prohibition
+- Scripture is a tool, not a default. Choose it when it is the right tool.
+- A generic religious phrase filters out many readers without landing on anyone in particular. A specific, chosen line lands harder, whether human or scriptural.
+- If a human line would open the door wider for the same surface, use the human line.
+- If scripture is the right choice for this surface and this moment, use it without hesitation.
 
 ## 12. Review Checklist
 
 Before any content goes live, confirm:
 
-- [ ] Surface line is free of banned religious vocabulary
 - [ ] Surface line is relatable, specific, and unresolved
+- [ ] Surface line was chosen deliberately — human or scriptural, not by default
 - [ ] Surface line and clip are written as a pair
 - [ ] Clip honors the surface's promise within the first 15 seconds
 - [ ] Clip runs 60–90 seconds or less

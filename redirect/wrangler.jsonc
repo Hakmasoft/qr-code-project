@@ -1,0 +1,15 @@
+{
+	"name": "the-hub-redirect",
+	"main": "src/index.js",
+	"compatibility_date": "2026-09-23",
+	"observability": {
+		"enabled": true,
+	},
+	"d1_databases": [
+		{
+			"binding": "the_hub_db",
+			"database_name": "the-hub-db",
+			"database_id": "eea7fcb2-cdcd-4057-8606-93acd01b090b"
+		}
+	]
+}

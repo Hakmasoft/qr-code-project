@@ -26,7 +26,7 @@ Escalation: technical issues → technical lead. Follow Up issues → Follow Up 
 | Scan events are being logged | Database query | Daily | See §7 |
 | Pending submissions are being picked up | `form_submissions` query | Daily | See §8 |
 | Failed handoffs | `form_submissions` where `handoff_status = 'failed'` | Daily | See §8 |
-| Video playback works | Open a topic page on a phone | Weekly | See §9 |
+| Embedded TikTok video plays | Open a topic page on a phone | Weekly | See §9 |
 | Season ad is current | `season_ads` where `active = true` | Weekly | See §10 |
 
 ## 4. Routine Tasks
@@ -71,7 +71,7 @@ Escalation: technical issues → technical lead. Follow Up issues → Follow Up 
 ### 4.5 Add a new topic tag
 
 1. Requires a Decision Log entry first.
-2. Produce a clip for the topic.
+2. Produce a clip for the topic and upload it to TikTok.
 3. Add the tag to the form dropdown and to the content style guide.
 4. Insert the clip row with `active = true`.
 5. Assign at least one slug to the new tag.
@@ -88,7 +88,7 @@ Escalation: technical issues → technical lead. Follow Up issues → Follow Up 
 | Metric | Source | Query basis |
 |:---|:---|:---|
 | Scan rate | `scan_events` + placement log | Count per slug ÷ surfaces printed |
-| Clip completion | Mux analytics | Per playback ID |
+| Clip completion | TikTok dashboard | Per video |
 | Next-step rate | `form_submissions` | Count ÷ scan events |
 | Handoff success rate | `form_submissions.handoff_status` | `sent` ÷ total |
 | Follow Up response time | Follow Up records | Time from handoff to first contact |
@@ -136,16 +136,16 @@ Review weekly during the pilot. A written summary is due at the end of the pilot
 
 ## 9. Failure: Video Not Playing
 
-**Symptoms:** Topic page loads but the clip or season ad does not play.
+**Symptoms:** Topic page loads but the embedded TikTok clip or season ad does not play.
 
 **Steps:**
-1. Check the Mux dashboard for playback errors.
-2. Confirm the playback ID in the `clips` or `season_ads` row is correct.
-3. Confirm the Hub is using the current playback ID (no stale cache).
-4. If Mux is down, confirm the fallback message shows on the Hub.
-5. If costs have hit the alert threshold, review whether to cap or switch delivery.
+1. Confirm the TikTok video still exists and is public.
+2. Confirm the URL stored in the `clips` or `season_ads` row matches the live TikTok video.
+3. Confirm the Hub is embedding, not redirecting. If a recent change introduced a redirect, revert it. This is a hard rule.
+4. If TikTok's embed is unavailable, confirm the fallback message and season ad text render on the Hub.
+5. If the TikTok account is restricted or a video is removed, re-upload to TikTok and update the stored URL.
 
-**Prevention:** Weekly check of video playback on a real phone. Monitor Mux usage against the alert threshold.
+**Prevention:** Weekly check of embedded playback on a real phone. Confirm TikTok videos remain public and reachable.
 
 ## 10. Failure: No Active Season Ad
 
@@ -188,7 +188,7 @@ Review weekly during the pilot. A written summary is due at the end of the pilot
 
 | Cost | Source | Threshold | Action at threshold |
 |:---|:---|:---|:---|
-| Video viewing minutes | Mux dashboard | Set monthly alert | Review, cap, or switch to object storage |
+| TikTok | Not applicable at pilot | None | Video hosting is free at pilot scale |
 | Database usage | Supabase dashboard | Set near free-tier limit | Review queries, archive old rows |
 | Worker requests | Cloudflare dashboard | Free tier ceiling | Confirm pilot scale, upgrade if justified |
 | Domain renewal | Registrar | 30 days before expiry | Renew |
@@ -203,7 +203,7 @@ Review costs monthly during the pilot.
 | `scan_events` | D1 export | Weekly |
 | `form_submissions` | Supabase backup | Daily |
 | `clips`, `season_ads` | Supabase backup | Weekly |
-| Video source files | Object storage | On upload |
+| Source video files | Local or cloud storage, not in repo | On upload |
 | Surface designs | Repo or shared drive | On change |
 
 Restore procedure: restore the most recent backup to a staging environment, verify, then promote. Never restore directly to production without verification.

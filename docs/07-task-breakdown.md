@@ -1,310 +1,270 @@
-# Task / Work Breakdown — Soul Hub
+# Decision Log (ADR) — Soul Hub
 
 ## 1. Purpose
 
-This document lists the discrete work items required to launch and operate the Soul Hub pilot. Each task is scoped to be small enough for a single contributor or agent to complete without further clarification.
-
-Read `docs/06-agent-instructions.md` before starting any task. Read the referenced doc for full context.
-
-## 2. Task Format
-
-Each task includes:
-
-- **ID** — stable identifier for referencing in commits, issues, and logs
-- **Title** — one-line description
-- **Deliverable** — the concrete output
-- **Definition of Done** — how completion is verified
-- **Depends on** — prerequisite task IDs
-- **Owner role** — the kind of contributor needed
-- **Doc reference** — where the detail lives
-
-## 3. Phase 0 — Foundations
-
-### T-001 — Register temporary domain
-
-- **Deliverable:** A domain we control, ready to point at Cloudflare Workers
-- **Definition of Done:** Domain resolves; DNS is manageable; no third-party shortener in the chain
-- **Depends on:** None
-- **Owner role:** Technical lead
-- **Doc reference:** `03-dev-stack-and-procedure.md` §4
-
-### T-002 — Create Cloudflare account and D1 database
-
-- **Deliverable:** A D1 database instance bound to a Worker project
-- **Definition of Done:** A test Worker can read and write to D1 in staging
-- **Depends on:** None
-- **Owner role:** Technical lead
-- **Doc reference:** `03-dev-stack-and-procedure.md` §3, §5
-
-### T-003 — Set up Supabase project
-
-- **Deliverable:** A Supabase project with the `form_submissions` table
-- **Definition of Done:** Table exists per schema; connection string stored in environment
-- **Depends on:** None
-- **Owner role:** Technical lead
-- **Doc reference:** `04-data-dictionary.md` §5
-
-### T-004 — Set up Mux account
-
-- **Deliverable:** A Mux account with API tokens and a test playback ID
-- **Definition of Done:** A sample video plays from a test page
-- **Depends on:** None
-- **Owner role:** Technical lead
-- **Doc reference:** `03-dev-stack-and-procedure.md` §8
-
-### T-005 — Set up Vercel project for the Hub
-
-- **Deliverable:** A Vercel project linked to the `hub/` directory
-- **Definition of Done:** Preview deployments work on pull requests
-- **Depends on:** None
-- **Owner role:** Technical lead
-- **Doc reference:** `03-dev-stack-and-procedure.md` §11
-
-## 4. Phase 1 — Data Layer
-
-### T-101 — Write initial migration for `slugs` and `scan_events`
-
-- **Deliverable:** A versioned migration file creating both tables
-- **Definition of Done:** Migration applies cleanly to local and staging D1
-- **Depends on:** T-002
-- **Owner role:** Backend contributor
-- **Doc reference:** `04-data-dictionary.md` §3, §4
-
-### T-102 — Write initial migration for `form_submissions`, `clips`, `season_ads`
-
-- **Deliverable:** A versioned migration file creating these tables
-- **Definition of Done:** Migration applies cleanly to local and staging Supabase
-- **Depends on:** T-003
-- **Owner role:** Backend contributor
-- **Doc reference:** `04-data-dictionary.md` §5, §6, §7
-
-### T-103 — Add indexes
-
-- **Deliverable:** Migration adding the indexes listed in the Data Dictionary
-- **Definition of Done:** Indexes exist in staging; query plans use them
-- **Depends on:** T-101, T-102
-- **Owner role:** Backend contributor
-- **Doc reference:** `04-data-dictionary.md` §10
-
-### T-104 — Seed topic tags and test slugs
-
-- **Deliverable:** Seed rows for the four topic tags and three test slugs
-- **Definition of Done:** Test slugs resolve in staging
-- **Depends on:** T-101
-- **Owner role:** Backend contributor
-- **Doc reference:** `04-data-dictionary.md` §8
-
-## 5. Phase 2 — Redirect Service
-
-### T-201 — Implement `/c/:slug` route
-
-- **Deliverable:** Worker route that looks up a slug and returns a 302
-- **Definition of Done:** Known slug redirects correctly; unknown slug redirects to fallback; no 404s
-- **Depends on:** T-101
-- **Owner role:** Backend contributor
-- **Doc reference:** `03-dev-stack-and-procedure.md` §6
-
-### T-202 — Implement scan event logging
-
-- **Deliverable:** Non-blocking write of one `scan_events` row per redirect
-- **Definition of Done:** Every redirect produces exactly one row; redirect latency is unaffected
-- **Depends on:** T-201
-- **Owner role:** Backend contributor
-- **Doc reference:** `04-data-dictionary.md` §4
-
-### T-203 — Implement fallback page
-
-- **Deliverable:** A minimal page shown when a slug is unknown or inactive
-- **Definition of Done:** Fallback renders on mobile; links to Hub homepage
-- **Depends on:** T-201
-- **Owner role:** Frontend contributor
-- **Doc reference:** `03-dev-stack-and-procedure.md` §6
-
-### T-204 — Deploy Worker to staging
-
-- **Deliverable:** Worker live on a staging subdomain
-- **Definition of Done:** End-to-end redirect and logging verified
-- **Depends on:** T-201, T-202, T-203, T-001
-- **Owner role:** Technical lead
-- **Doc reference:** `03-dev-stack-and-procedure.md` §11
-
-## 6. Phase 3 — Hub
-
-### T-301 — Scaffold Next.js app
-
-- **Deliverable:** A Next.js App Router project in `hub/`
-- **Definition of Done:** Dev server runs; lint passes; Vercel preview deploys
-- **Depends on:** T-005
-- **Owner role:** Frontend contributor
-- **Doc reference:** `03-dev-stack-and-procedure.md` §7
-
-### T-302 — Build topic page `/[topic]`
-
-- **Deliverable:** A page that loads the clip for a topic, then the season ad, then the form
-- **Definition of Done:** Loads in under 3 seconds on a phone; correct clip served per topic
-- **Depends on:** T-301, T-102, T-004
-- **Owner role:** Frontend contributor
-- **Doc reference:** `03-dev-stack-and-procedure.md` §7
-
-### T-303 — Build Hub home page `/`
-
-- **Deliverable:** A simple index of available topics
-- **Definition of Done:** Mobile-first; loads fast; links to topic pages
-- **Depends on:** T-301
-- **Owner role:** Frontend contributor
-- **Doc reference:** `03-dev-stack-and-procedure.md` §7
-
-### T-304 — Build the next-step form
-
-- **Deliverable:** A four-field form that writes to `form_submissions`
-- **Definition of Done:** Submissions persist; confirmation screen shows response-time promise; silent fields captured
-- **Depends on:** T-302, T-102
-- **Owner role:** Frontend contributor
-- **Doc reference:** `02-content-style-guide.md` §9, `04-data-dictionary.md` §5
-
-### T-305 — Build season ad rotation
-
-- **Deliverable:** Hub reads the active `season_ads` row and renders it after the clip
-- **Definition of Done:** Changing the active row in the database changes the Hub without a redeploy
-- **Depends on:** T-302, T-102
-- **Owner role:** Frontend contributor
-- **Doc reference:** `04-data-dictionary.md` §7
-
-### T-306 — Deploy Hub to staging
-
-- **Deliverable:** Hub live on a staging URL
-- **Definition of Done:** End-to-end flow works: redirect → topic page → clip → season ad → form
-- **Depends on:** T-302, T-304, T-305
-- **Owner role:** Technical lead
-- **Doc reference:** `03-dev-stack-and-procedure.md` §11
-
-## 7. Phase 4 — Follow Up Handoff
-
-### T-401 — Implement handoff worker
-
-- **Deliverable:** A scheduled script that picks up `pending` submissions and posts them to the Follow Up endpoint
-- **Definition of Done:** Delivery updates `handoff_status`; failures retry per policy
-- **Depends on:** T-102
-- **Owner role:** Backend contributor
-- **Doc reference:** `05-integration-contract-followup.md` §3–§8
-
-### T-402 — Implement retry and alerting
-
-- **Deliverable:** Retries on failure; alert on final failure
-- **Definition of Done:** Simulated failure triggers retries and an alert
-- **Depends on:** T-401
-- **Owner role:** Backend contributor
-- **Doc reference:** `05-integration-contract-followup.md` §8
-
-### T-403 — Run end-to-end handoff test
-
-- **Deliverable:** A test submission reaches Follow Up and is confirmed received
-- **Definition of Done:** All steps in the contract's testing procedure pass
-- **Depends on:** T-401, T-402, T-306
-- **Owner role:** Technical lead + Follow Up lead
-- **Doc reference:** `05-integration-contract-followup.md` §12
-
-## 8. Phase 5 — Content
-
-### T-501 — Write 6–8 surface lines across hook styles
-
-- **Deliverable:** A set of candidate surface lines with matching clip briefs
-- **Definition of Done:** Each line passes the content style guide checklist
-- **Depends on:** None
-- **Owner role:** Content lead
-- **Doc reference:** `02-content-style-guide.md` §5
-
-### T-502 — Produce 3–4 topic clips
-
-- **Deliverable:** Finished videos, 60–90 seconds each, uploaded to Mux
-- **Definition of Done:** Playback IDs stored in `clips`; each honors its surface's promise
-- **Depends on:** T-501, T-004
-- **Owner role:** Content lead
-- **Doc reference:** `02-content-style-guide.md` §7
-
-### T-503 — Produce the first season ad
-
-- **Deliverable:** A 10–20 second warm invitation, uploaded to Mux
-- **Definition of Done:** Row exists in `season_ads` with a valid active window
-- **Depends on:** T-004, T-102
-- **Owner role:** Content lead
-- **Doc reference:** `02-content-style-guide.md` §8
-
-### T-504 — Design the surface layout
-
-- **Deliverable:** A print-ready design with text, QR, and Phaneroo name
-- **Definition of Done:** Follows QR placement rules; passes content checklist
-- **Depends on:** T-501, T-001
-- **Owner role:** Design lead
-- **Doc reference:** `02-content-style-guide.md` §6
-
-## 9. Phase 6 — Pilot Launch
-
-### T-601 — Print small pilot batch
-
-- **Deliverable:** A small batch of surfaces using staging slugs
-- **Definition of Done:** Codes scan correctly; text and QR are legible
-- **Depends on:** T-504, T-204
-- **Owner role:** Project owner
-- **Doc reference:** `03-dev-stack-and-procedure.md` §15
-
-### T-602 — Place pilot surfaces and monitor
-
-- **Deliverable:** Surfaces placed; scan events monitored for 48 hours
-- **Definition of Done:** Scan events appear in the database
-- **Depends on:** T-601
-- **Owner role:** Project owner
-- **Doc reference:** `03-dev-stack-and-procedure.md` §15
-
-### T-603 — Promote to production domains
-
-- **Deliverable:** Redirect service and Hub live on production domains
-- **Definition of Done:** End-to-end flow works with production slugs
-- **Depends on:** T-602
-- **Owner role:** Technical lead
-- **Doc reference:** `03-dev-stack-and-procedure.md` §15
-
-### T-604 — Print remaining pilot batch
-
-- **Deliverable:** Remaining surfaces printed with production slugs
-- **Definition of Done:** Placed and confirmed scanning
-- **Depends on:** T-603
-- **Owner role:** Project owner
-- **Doc reference:** `03-dev-stack-and-procedure.md` §15
-
-### T-605 — End-of-pilot review
-
-- **Deliverable:** A written summary of scan rate, clip completion, next-step rate, and a decision
-- **Definition of Done:** Decision recorded (expand, adjust, or stop) with rationale
-- **Depends on:** T-604
-- **Owner role:** Project owner + all leads
-- **Doc reference:** `01-project-brief.md` §12
-
-## 10. Dependency Overview
-
-```
-T-001 ─┐
-T-002 ─┼─► T-101 ─► T-103 ─► T-201 ─► T-202 ─► T-204 ─┐
-T-003 ─┼─► T-102 ─► T-103                            │
-T-004 ─┼─► T-502, T-503                              │
-T-005 ─┴─► T-301 ─► T-302 ─► T-304 ─► T-306 ────────┤
-                    │      └─► T-305                 │
-                    └─► T-303                         │
-T-102 ─► T-401 ─► T-402 ─► T-403 ────────────────────┤
-T-501 ─► T-502, T-504                                │
-T-504 ─► T-601 ─► T-602 ─► T-603 ─► T-604 ─► T-605 ◄─┘
-```
-
-## 11. Open Items Requiring Decisions
-
-Before certain tasks can begin, these must be resolved:
-
-| Item | Blocks | Owner |
+This document records decisions made about Soul Hub, when they were made, why, and what alternatives were rejected. It exists so that future contributors — human or agent — understand *why* things are the way they are before changing them.
+
+Agents: do not "improve" a decision recorded here without an explicit instruction. If a decision needs revisiting, add a new entry; do not edit the old one.
+
+## 2. Format
+
+Each entry includes:
+
+- **ID** — stable identifier (`ADR-001`, `ADR-002`, …)
+- **Date** — when the decision was made
+- **Status** — `Accepted`, `Superseded`, `Reversed`, `Proposed`
+- **Decision** — what was decided, in one or two sentences
+- **Context** — what prompted the decision
+- **Rationale** — why this option was chosen
+- **Alternatives rejected** — what else was considered and why it lost
+- **Consequences** — what this locks in, and what it costs
+
+Entries are newest-last. Superseded decisions keep their entry and reference the superseding ID.
+
+## 3. Entries
+
+---
+
+### ADR-001 — Use a physical surface + QR code + Hub model
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** The project places relatable text and a QR code on physical surfaces, linking to a digital Hub that serves a matched video clip and a next step.
+- **Context:** Traditional materials (brochures, flyers) end the moment they are distributed. There is no way to know who engaged, and no mechanism to capture interest.
+- **Rationale:** The two-layer design separates the moment of curiosity (surface) from the moment of depth (clip). It also produces measurable scan data, which brochures cannot.
+- **Alternatives rejected:**
+  - Brochures alone — no feedback loop, no next step
+  - Static QR to a generic homepage — no context matching, weak conversion
+  - App-based engagement — too much friction for a cold encounter
+- **Consequences:** Requires a redirect service, a Hub, and a content pipeline. Locks in the "print the identifier, not the destination" principle.
+
+---
+
+### ADR-002 — Surfaces carry no explicitly religious vocabulary
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** Surface lines must be human, relatable, and free of religious vocabulary. The clip does the spiritual work.
+- **Context:** Religious language triggers filtering before curiosity can work. A large share of scanners categorize the message as "religious material" and stop reading.
+- **Rationale:** Recognition opens the door; persuasion can come later. A relatable line keeps attention for the two seconds needed to scan. The clip then makes the connection.
+- **Alternatives rejected:**
+  - Leading with scripture or doctrine on surfaces — filters out the audience before curiosity works
+  - Leading with "church" or a denominational name — same filtering effect, weaker trust
+  - Leading with a Bible verse — the person has no reason to care yet
+- **Consequences:** The clip and season ad carry the entire spiritual payload. Surface and clip must be written as a pair.
+
+---
+
+### ADR-003 — Use dynamic short links on a domain we control
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** Printed QR codes encode a short link on a domain we control. They never encode the final Hub URL or a third-party shortener.
+- **Context:** Hub structure will change over time. Printed material cannot be reprinted every time a page moves. Third-party services can disappear or change terms.
+- **Rationale:** A short link we own can be redirected anywhere by editing a database row. Printed material stays valid indefinitely. No dependency on an external service.
+- **Alternatives rejected:**
+  - Static QR encoding the final URL — breaks the moment the Hub changes
+  - Third-party dynamic QR services — free tiers have scan limits; redirects can stop; dependency risk
+  - Direct to `phaneroo.org` at pilot — we want to avoid coupling pilot material to the main domain
+- **Consequences:** Requires operating a redirect service. Introduces a technical dependency we own. In return, printed material is future-proof.
+
+---
+
+### ADR-004 — Do not launch on public poles
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** Public poles are excluded from the pilot surface list.
+- **Context:** Poles are public, anonymous, offer no dwell time, and in many municipalities are illegal to post on. Anonymous QR codes read as scams rather than invitations.
+- **Rationale:** Scan rate is the make-or-break variable. Poles sit in the weakest category for trust and dwell time. Fines and removal create reputational risk.
+- **Alternatives rejected:**
+  - Poles as a cheap, high-volume surface — volume does not matter if scan rate is near zero
+  - Poles with municipality permission — still weak on trust and dwell
+- **Consequences:** The pilot focuses on hotel rooms or cups. Poles may be revisited later, with permission and a different design.
+
+---
+
+### ADR-005 — Pilot one surface, not many
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** The pilot launches on a single surface type, with a small set of surface line variants.
+- **Context:** Different surfaces perform very differently. Testing many at once produces data that cannot be attributed to any single variable.
+- **Rationale:** One surface, several line variants, gives a clean read on what works. Expansion follows evidence.
+- **Alternatives rejected:**
+  - Launching on cups, hotel rooms, and cards simultaneously — confounds results, spreads effort thin
+- **Consequences:** Slower visible spread at launch. Faster learning. A decision point at the end of the pilot.
+
+---
+
+### ADR-006 — Leave the response to the person
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** The Hub offers clear next steps, but the project does not chase or pressure. If the person opts in, Follow Up engages.
+- **Context:** Aggressive follow-up is both a staffing burden and a missiological mismatch with a sower-model approach.
+- **Rationale:** Respects the person, scales infinitely, and removes a staffing bottleneck. Phaneroo's Follow Up department already exists to handle those who opt in.
+- **Alternatives rejected:**
+  - Mandatory contact capture before viewing — kills the moment, increases drop-off
+  - Automated outreach to every scanner — no consent, high risk
+  - No follow-up at all — wastes the Follow Up department's capacity
+- **Consequences:** Success metrics focus on scan rate, clip completion, and opt-in rate, not on "contacts captured."
+
+---
+
+### ADR-007 — Use Cloudflare Workers + D1 for the redirect service
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** The redirect service runs on Cloudflare Workers with D1 as its database.
+- **Context:** The redirect must be instant. Scanners have near-zero patience. Free tiers must be adequate for a pilot.
+- **Rationale:** Workers have no cold start, run at the edge, and offer 100k requests/day on the free tier. D1 binds directly to the Worker, avoiding a separate database service.
+- **Alternatives rejected:**
+  - Render free web service — spins down after 15 min idle; cold start kills redirect UX
+  - Vercel Functions — no built-in database on free tier; requires an external DB
+  - Traditional VPS — more operational overhead than the pilot needs
+- **Consequences:** Locked into Cloudflare for this layer. Migration later is possible but non-trivial.
+
+---
+
+### ADR-008 — Use Next.js for the Hub
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** The Hub is built with Next.js (App Router).
+- **Context:** The Hub must load fast on mobile, be easy to iterate on, and support a headless CMS.
+- **Rationale:** SSR/SSG out of the box, strong mobile performance, large ecosystem, and Vercel free tier is adequate to start.
+- **Alternatives rejected:**
+  - Plain static HTML — fast but hard to maintain as topics grow
+  - WordPress — heavier, not mobile-first by default
+  - Astro — good fit but smaller ecosystem for the form and CMS integrations needed
+- **Consequences:** Hub deploys on Vercel. Content model decoupled via a headless CMS.
+
+---
+
+### ADR-009 — Use Mux for video hosting
+
+- **Date:** 2026-09-22
+- **Status:** Superseded by ADR-015
+- **Decision:** Video clips and season ads are hosted on Mux.
+- **Context:** Self-hosting video introduces bandwidth cost and operational complexity. Video is the core content of the Hub.
+- **Rationale:** Mux handles encoding, delivery, and playback. Playback IDs are simple to store and embed. Cost scales with viewing minutes, which is manageable at pilot scale.
+- **Alternatives rejected:**
+  - Self-hosted video on object storage — higher bandwidth cost, worse experience, more maintenance
+  - YouTube embeds — ads, branding, and analytics outside our control
+  - Cloudflare Stream — viable alternative; Mux chosen for playback analytics and developer experience
+- **Consequences:** Viewing-minute cost is the primary variable cost. Cost alerts are required. Fallback to object storage exists if costs spike. Superseded by ADR-015.
+
+---
+
+### ADR-010 — Use a temporary domain at pilot, not `phaneroo.org`
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** The pilot uses a temporary domain we control. Migration to a `phaneroo.org` subdomain happens later.
+- **Context:** The pilot may be adjusted or stopped. Coupling pilot material to the main domain creates cleanup work if the project changes direction.
+- **Rationale:** A temporary domain keeps the pilot independent, lets us test without brand-side dependencies, and still gives us full control of the redirect chain.
+- **Alternatives rejected:**
+  - `phaneroo.org` from day one — harder to unwind, involves more stakeholders early
+  - A third-party shortener — no control, terms may change
+- **Consequences:** A domain purchase and DNS setup at pilot. Printed material at pilot uses the temporary domain; later material can use the permanent one.
+
+---
+
+### ADR-011 — Four fields maximum on the next-step form
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** The next-step form collects Name, Contact (phone or email), Topic (optional), and Consent. No other visible fields.
+- **Context:** Every additional field reduces completion. The purpose of the form is to open a conversation, not to collect a profile.
+- **Rationale:** Four fields is the minimum needed for Follow Up to open a specific, personal conversation. Additional information can be gathered by the human.
+- **Alternatives rejected:**
+  - Longer intake form (age, location, how did you hear) — increases friction, reduces completion
+  - Email-only form — cuts off the phone/WhatsApp channel, which is preferred in context
+  - No form, contact info only — Follow Up cannot open with anything specific
+- **Consequences:** Follow Up opens conversations with limited data. The topic tag is the key signal that makes the first contact feel personal.
+
+---
+
+### ADR-012 — Handoff to Follow Up via webhook, with CSV fallback
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** Form submissions are pushed to Follow Up via webhook if an endpoint exists; otherwise via scheduled CSV export with manual import.
+- **Context:** Deep API integration with Phaneroo's Team Member / Supervisor apps is out of scope for MVP. Volume is unknown until the pilot runs.
+- **Rationale:** A webhook is simple, testable, and sufficient. The CSV fallback ensures the pilot is not blocked on API availability.
+- **Alternatives rejected:**
+  - Deep API integration at MVP — premature; validates nothing the pilot needs
+  - Manual-only handoff — does not scale even modestly, and creates lag
+  - No handoff — wastes the Follow Up department's capacity
+- **Consequences:** A scheduled worker and retry/alerting are required. The contract in `05-integration-contract-followup.md` governs the payload.
+
+---
+
+### ADR-013 — Clips are evergreen; season ads rotate
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** Topic clips are produced once and reused. The season ad rotates independently, via the database, without reshooting clips.
+- **Context:** Reshooting clips every season is expensive. The clip's job is to answer the surface's promise; the ad's job is to make a current invitation.
+- **Rationale:** Separating the two content streams means one shoot serves many seasons. The Hub stays current without heavy production.
+- **Alternatives rejected:**
+  - One combined clip including the current invitation — forces reshoots each season
+  - No season ad — loses the concrete, timely next step
+- **Consequences:** Two content streams must be managed. The Hub queries for the active season ad at render time.
+
+---
+
+### ADR-014 — Topic tags are a controlled list of four
+
+- **Date:** 2026-09-22
+- **Status:** Accepted
+- **Decision:** The `topic` field draws from a controlled list of four tags: `peace`, `purpose`, `identity`, `hope`.
+- **Context:** Topic tags appear in `slugs`, `clips`, and `form_submissions`. Uncontrolled tags break matching and reporting.
+- **Rationale:** Four tags cover the pilot's content and keep matching simple. Adding a tag is a deliberate decision, not an accident.
+- **Alternatives rejected:**
+  - Free-text topics — breaks matching and reporting
+  - Ten+ tags — too many for a pilot, fragments content production
+  - One tag — no useful segmentation
+- **Consequences:** Adding a tag requires a Decision Log entry and a new clip. Every slug must map to exactly one tag.
+
+---
+
+### ADR-015 — Use TikTok for clip hosting, embedded on the Hub
+
+- **Date:** 2026-09-23
+- **Status:** Accepted
+- **Decision:** Clips and season ads are hosted on TikTok and embedded on the Hub via TikTok's embed player. The Hub remains the conversion point. Users are not redirected away from the Hub to TikTok.
+- **Context:** Mux bills per viewing minute, which is the single largest variable cost in the project. TikTok hosts short-form video for free, matches the content format natively, and can distribute clips through its algorithm as a secondary channel. The original Mux decision was made before the pilot's cost sensitivity was fully understood.
+- **Rationale:**
+  - Removes the largest variable cost (video viewing minutes)
+  - TikTok's format matches the content style (60–90 second vertical clips)
+  - The algorithm can extend reach beyond people who scan a QR code
+  - Embedding keeps the user on the Hub, preserving the form and Follow Up handoff
+- **Alternatives rejected:**
+  - Mux — cost scales with viewing minutes; no distribution benefit
+  - Self-hosted video — bandwidth cost, operational complexity, no distribution benefit
+  - Direct redirect to TikTok — loses the form, loses contact capture, loses Follow Up handoff
+  - YouTube — ads, branding, weaker fit for short-form vertical
+- **Consequences:**
+  - Video hosting cost drops to zero at pilot scale
+  - The project depends on TikTok's embed availability and terms; a fallback may be needed later
+  - `clips.video_url` and `season_ads.video_url` store TikTok video IDs or URLs, not Mux playback IDs
+  - Clip analytics come from TikTok, not from a Mux dashboard
+  - The Hub must embed, not redirect. This is a hard rule.
+
+---
+
+## 4. Superseded and Reversed Decisions
+
+| ID | Status | Superseded by |
 |:---|:---|:---|
-| Confirm webhook endpoint URL | T-401 | Follow Up lead |
-| Confirm API key exchange | T-401 | Technical lead |
-| Confirm response-time promise | T-304 | Follow Up lead |
-| Confirm alert channel | T-402 | Technical lead |
-| Choose pilot surface (hotel or cups) | T-504, T-601 | Project owner |
-| Choose temporary domain name | T-001 | Project owner |
-| Confirm topic tags (final list) | T-104, T-501 | Content lead |
+| ADR-009 | Superseded | ADR-015 |
+
+## 5. Proposed Decisions
+
+Decisions under discussion but not yet accepted. Move to §3 when accepted.
+
+| ID | Topic | Status | Owner |
+|:---|:---|:---|:---|
+| | | | |

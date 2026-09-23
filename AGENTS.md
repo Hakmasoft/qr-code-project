@@ -8,7 +8,7 @@ For deeper detail, this file points to the other documents in `docs/`. Do not as
 
 ## 2. Project Summary
 
-Soul Hub places relatable, non-religious messages on physical surfaces (cups, hotel rooms) with a QR code. Scanning the code opens a short video clip matched to the surface text, followed by a warm invitation to a current Phaneroo event, followed by a simple next-step form. Form submissions are handed off to Phaneroo's Follow Up department.
+Soul Hub places relatable messages on physical surfaces (cups, hotel rooms) with a QR code. Scanning the code opens a short video clip matched to the surface text, followed by a warm invitation to a current Phaneroo event, followed by a simple next-step form. Form submissions are handed off to Phaneroo's Follow Up department.
 
 The core design principle: **the surface determines the response.** Everything downstream depends on whether one printed line makes someone stop and scan.
 
@@ -35,7 +35,7 @@ soul-hub/
 | Hub | Next.js (App Router) |
 | Hub CMS | Sanity or Strapi 5 |
 | Hub database | Supabase (Postgres) |
-| Video hosting | Mux |
+| Video hosting | TikTok (embedded on Hub) |
 | Hub deployment | Vercel |
 | Redirect deployment | Wrangler |
 
@@ -89,14 +89,16 @@ These rules are non-negotiable. Violating any of them will break printed materia
 8. **Never delete a `slug` row** while its surface may be in circulation. Deactivate instead.
 9. **Never change the handoff payload** without updating `docs/05-integration-contract-followup.md` and getting agreement from the Follow Up lead.
 10. **Never commit `.env` files or secrets.**
+11. **Never redirect a user off the Hub to TikTok.** Clips are embedded, not linked out. See ADR-015.
 
 ## 7. Content Rules (Summary)
 
 Applies to any agent generating surface lines, clip scripts, or Hub copy.
 
-- **Surfaces carry no religious vocabulary.** Banned: God, Jesus, Christ, Lord, Savior, salvation, sin, repent, church, gospel, Bible, verse, faith, holy, worship, prayer, preach.
-- **Surface lines are human, relatable, specific, unresolved.** One to two lines. Readable in two seconds.
-- **The clip does the spiritual work.** It must honor the surface's promise within the first 15 seconds.
+- **Surface lines are human, relatable, specific, and unresolved.** One to two lines. Readable in two seconds.
+- **Surfaces may carry scripture or religious reference.** It is not banned. The choice is deliberate — fitted to the surface, the moment, and the person it is meant to reach.
+- **Choose on purpose, not by default.** A generic religious phrase filters out many readers without landing on anyone in particular. A specific, chosen line lands harder, whether human or scriptural.
+- **The clip does the deeper spiritual work.** It must honor the surface's promise within the first 15 seconds.
 - **The season ad is warm, specific, and current.** 10–20 seconds.
 - **Surface and clip are written as a pair.** Never one without the other.
 

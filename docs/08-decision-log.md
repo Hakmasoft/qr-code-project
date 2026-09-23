@@ -43,7 +43,7 @@ Entries are newest-last. Superseded decisions keep their entry and reference the
 ### ADR-002 — Surfaces carry no explicitly religious vocabulary
 
 - **Date:** 2026-09-22
-- **Status:** Accepted
+- **Status:** Superseded by ADR-016
 - **Decision:** Surface lines must be human, relatable, and free of religious vocabulary. The clip does the spiritual work.
 - **Context:** Religious language triggers filtering before curiosity can work. A large share of scanners categorize the message as "religious material" and stop reading.
 - **Rationale:** Recognition opens the door; persuasion can come later. A relatable line keeps attention for the two seconds needed to scan. The clip then makes the connection.
@@ -51,7 +51,7 @@ Entries are newest-last. Superseded decisions keep their entry and reference the
   - Leading with scripture or doctrine on surfaces — filters out the audience before curiosity works
   - Leading with "church" or a denominational name — same filtering effect, weaker trust
   - Leading with a Bible verse — the person has no reason to care yet
-- **Consequences:** The clip and season ad carry the entire spiritual payload. Surface and clip must be written as a pair.
+- **Consequences:** The clip and season ad carry the entire spiritual payload. Surface and clip must be written as a pair. Superseded by ADR-016.
 
 ---
 
@@ -145,7 +145,7 @@ Entries are newest-last. Superseded decisions keep their entry and reference the
 ### ADR-009 — Use Mux for video hosting
 
 - **Date:** 2026-09-22
-- **Status:** Accepted
+- **Status:** Superseded by ADR-015
 - **Decision:** Video clips and season ads are hosted on Mux.
 - **Context:** Self-hosting video introduces bandwidth cost and operational complexity. Video is the core content of the Hub.
 - **Rationale:** Mux handles encoding, delivery, and playback. Playback IDs are simple to store and embed. Cost scales with viewing minutes, which is manageable at pilot scale.
@@ -153,7 +153,7 @@ Entries are newest-last. Superseded decisions keep their entry and reference the
   - Self-hosted video on object storage — higher bandwidth cost, worse experience, more maintenance
   - YouTube embeds — ads, branding, and analytics outside our control
   - Cloudflare Stream — viable alternative; Mux chosen for playback analytics and developer experience
-- **Consequences:** Viewing-minute cost is the primary variable cost. Cost alerts are required. Fallback to object storage exists if costs spike.
+- **Consequences:** Viewing-minute cost is the primary variable cost. Cost alerts are required. Fallback to object storage exists if costs spike. Superseded by ADR-015.
 
 ---
 
@@ -230,13 +230,84 @@ Entries are newest-last. Superseded decisions keep their entry and reference the
 
 ---
 
-## 4. Superseded and Reversed Decisions
+### ADR-015 — Use TikTok for clip hosting, embedded on the Hub
 
-When a decision is superseded or reversed, list it here with a reference to the new entry.
+- **Date:** 2026-09-23
+- **Status:** Accepted
+- **Decision:** Clips and season ads are hosted on TikTok and embedded on the Hub via TikTok's embed player. The Hub remains the conversion point. Users are not redirected away from the Hub to TikTok.
+- **Context:** Mux bills per viewing minute, which is the single largest variable cost in the project. TikTok hosts short-form video for free, matches the content format natively, and can distribute clips through its algorithm as a secondary channel. The original Mux decision was made before the pilot's cost sensitivity was fully understood.
+- **Rationale:**
+  - Removes the largest variable cost (video viewing minutes)
+  - TikTok's format matches the content style (60–90 second vertical clips)
+  - The algorithm can extend reach beyond people who scan a QR code
+  - Embedding keeps the user on the Hub, preserving the form and Follow Up handoff
+- **Alternatives rejected:**
+  - Mux — cost scales with viewing minutes; no distribution benefit
+  - Self-hosted video — bandwidth cost, operational complexity, no distribution benefit
+  - Direct redirect to TikTok — loses the form, loses contact capture, loses Follow Up handoff
+  - YouTube — ads, branding, weaker fit for short-form vertical
+- **Consequences:**
+  - Video hosting cost drops to zero at pilot scale
+  - The project depends on TikTok's embed availability and terms; a fallback may be needed later
+  - `clips.video_url` and `season_ads.video_url` store TikTok video IDs or URLs, not Mux playback IDs
+  - Clip analytics come from TikTok, not from a Mux dashboard
+  - The Hub must embed, not redirect. This is a hard rule.
+
+---
+
+### ADR-016 — Surfaces may carry scripture, chosen deliberately
+
+- **Date:** 2026-09-23
+- **Status:** Accepted
+- **Decision:** Surfaces may carry scripture or religious reference. It is not banned. The choice is deliberate — fitted to the surface, the moment, and the person it is meant to reach.
+- **Context:** ADR-002 originally banned religious vocabulary on surfaces to avoid triggering filtering before curiosity could work. After review, the team decided this was too restrictive. A scriptural line, placed with intention, can minister to the person it is meant to reach in a way a purely human line may not. The filtering concern is real, but prohibition is not the right response to it.
+- **Rationale:**
+  - The filtering concern remains valid, but it argues for deliberation, not prohibition
+  - A specific, chosen scriptural line lands harder than a generic religious phrase
+  - A human line still opens the door wider for some surfaces and moments
+  - The team trusts that a line chosen with care will reach the person it is meant for
+- **Alternatives rejected:**
+  - Keeping the full ban (ADR-002) — too restrictive; removes a legitimate tool
+  - Allowing scripture by default — loses the discipline that made the earlier rule work
+  - Allowing only "soft" religious language — arbitrary and hard to enforce
+- **Consequences:**
+  - The rule shifts from "banned" to "deliberate"
+  - Surface lines may be human, scriptural, or a blend
+  - The content style guide now provides guidance rather than prohibition
+  - The clip still does the deeper spiritual work, regardless of the surface line's nature
+  - Surface and clip remain paired; the clip must honor whatever promise the surface makes
+
+---
+
+### ADR-017 — Use `ctx.waitUntil()` for fire-and-forget writes in Cloudflare Workers
+
+- **Date:** 2026-09-23
+- **Status:** Accepted
+- **Decision:** Any async write that must complete but should not block the response — such as logging a scan event — must be wrapped in `ctx.waitUntil()`. Bare `.run()` calls without `waitUntil` are not permitted.
+- **Context:** During pilot development, the redirect worked correctly but scan events were not being written to D1. The insert used a fire-and-forget pattern (`.run().catch(...)`) with no `waitUntil`. The Worker returned its 302 response, and the Cloudflare runtime terminated the execution context before the D1 write completed. The error was silently swallowed by the `.catch()`, making the bug invisible in logs.
+- **Rationale:**
+  - Cloudflare Workers terminate pending async work when the response is returned, unless the work is registered with `ctx.waitUntil()`
+  - Fire-and-forget without `waitUntil` is unreliable by design, not by accident
+  - The silent catch hid the failure; making failures visible is not enough if the promise itself is cancelled
+- **Alternatives rejected:**
+  - Awaiting the write before returning the response — adds latency to every redirect, which is unacceptable for a QR scan
+  - Fire-and-forget without `waitUntil` — proven unreliable; the original bug
+  - Logging via an external queue — overkill at pilot scale
+- **Consequences:**
+  - The Worker signature must include `ctx` as the third argument to `fetch`: `async fetch(request, env, ctx)`
+  - All non-blocking writes must be wrapped: `ctx.waitUntil(promise)`
+  - The same pattern applies to the Hub's form submission and to the handoff worker
+  - This becomes a coding convention for the project, not just a fix for one bug
+  - Error handling inside the wrapped promise should log visibly, not swallow silently
+
+---
+
+## 4. Superseded and Reversed Decisions
 
 | ID | Status | Superseded by |
 |:---|:---|:---|
-| | | |
+| ADR-009 | Superseded | ADR-015 |
+| ADR-002 | Superseded | ADR-016 |
 
 ## 5. Proposed Decisions
 

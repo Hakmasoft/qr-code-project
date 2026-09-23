@@ -1,0 +1,8 @@
+(task) redirect service live on Cloudflare Workers
+
+- Cloudflare Worker at the-hub-redirect.scripturehub.workers.dev
+- D1 database the-hub-db with slugs and scan_events tables
+- /c/:slug route with slug lookup, 302 redirect, and fallback page
+- Scan event logging via ctx.waitUntil() with device detection and IP hashing
+- Verified end-to-end: QR scan on mobile logged correctly
+- Docs updated for pilot mode, TikTok embed, and scripture-on-surfaces"

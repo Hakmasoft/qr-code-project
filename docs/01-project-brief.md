@@ -8,7 +8,7 @@ Soul Hub places relatable, curiosity-driven messages on everyday physical surfac
 
 The gospel is often shared through materials that end the moment they are distributed — brochures, flyers, posters. There is no way to know who read them, who was moved, or who wanted to know more. Meanwhile, everyday surfaces (cups, hotel rooms, cards) carry no message at all.
 
-There is an opportunity to turn ordinary surfaces into doorways: a short, human message that earns a scan, a brief clip that answers the curiosity, and a warm next step into a real community.
+There is an opportunity to turn ordinary surfaces into doorways: a short message that earns a scan, a brief clip that answers the curiosity, and a warm next step into a real community.
 
 Phaneroo already has a structured Follow Up department. Most campaigns die at the last mile because no one owns the response. This project has that piece already in place.
 
@@ -27,7 +27,9 @@ Phaneroo already has a structured Follow Up department. Most campaigns die at th
 
 ## 4. Target Audience and Moments
 
-**Audience:** Anyone who encounters a surface. No prior church background assumed. No religious vocabulary on surfaces, so the message is not filtered out before curiosity can work.
+**Audience:** Anyone who encounters a surface. No prior church background assumed.
+
+Surfaces may carry human lines, scriptural lines, or a blend. The choice is deliberate — fitted to the surface, the moment, and the person it is meant to reach. Scripture is permitted; it is not a default.
 
 **Moments (context matters more than the object):**
 - Casual, high-traffic moments (cups, public-facing cards)
@@ -40,10 +42,10 @@ Each moment calls for a different hook style and a different next step.
 
 **Surface → Scan → Clip → Season Ad → Next Step → Follow Up**
 
-1. **Surface** — a relatable, human message with a QR code. No explicitly religious words.
+1. **Surface** — a short message with a QR code. The line may be human, scriptural, or a blend, chosen to fit the moment.
 2. **Scan** — QR points to a short link owned by Phaneroo, which redirects to the Hub.
-3. **Clip** — a 60–90 second video matched to the surface text. This is where the spiritual connection is made.
-4. **Season Ad** — a 10–20 second warm invitation to what is happening now (conference, service, community).
+3. **Clip** — a 60–90 second video matched to the surface text, hosted on TikTok and embedded on the Hub. This is where the spiritual connection is made.
+4. **Season Ad** — a 10–20 second warm invitation to what is happening now (conference, service, community), hosted on TikTok and embedded on the Hub.
 5. **Next Step** — a simple form or self-serve action.
 6. **Follow Up** — Phaneroo's existing Follow Up department engages those who opt in.
 
@@ -51,11 +53,11 @@ Each moment calls for a different hook style and a different next step.
 
 | Layer | Job | Tone |
 |:---|:---|:---|
-| Surface | Make someone stop and scan | Human, relatable, unresolved |
+| Surface | Make someone stop and scan | Human or scriptural, chosen deliberately |
 | Clip | Answer the curiosity, make the connection | Warm, honest, meaningful |
 | Season Ad | Offer a concrete next step this season | Welcoming, specific, no pressure |
 
-The surface carries no explicitly religious vocabulary. The clip does the spiritual work. The season ad makes a specific, current invitation.
+The surface may carry scripture or stay fully human. Either way, the line is chosen on purpose. The clip does the deeper spiritual work. The season ad makes a specific, current invitation.
 
 ## 7. Pilot Scope
 
@@ -93,11 +95,14 @@ Named individuals to be assigned.
 |:---|:---|
 | Low scan rate | Prioritize high-trust, high-dwell surfaces; put Phaneroo name next to code; state value explicitly |
 | Trust deficit | Branded surfaces, clear value proposition, warm Hub design |
-| Video hosting cost scaling | Set viewing caps, monitor Mux usage, fallback to object storage if needed |
+| Video hosting cost scaling | Resolved: TikTok hosts for free at pilot scale. See ADR-015 |
+| TikTok embed availability | Fallback message on Hub; identify alternative host before scale |
+| Platform dependency | Keep the Hub as the conversion point; TikTok is a distribution channel, not the destination |
 | External scrutiny of Phaneroo | Hub's first impression must be warm, clear, self-contained |
 | Follow Up overload | Confirm capacity before launch; pilot volume only |
 | Printed code becomes dead | Use dynamic short links on a domain we control; never print final URLs |
 | Bait-and-switch perception | Surface and clip written as a pair; clip must honor the surface's promise |
+| Generic religious line filters without landing | Choose surface lines deliberately — human or scriptural — rather than defaulting to either |
 
 ## 11. Open Questions
 

@@ -1,3 +1,5 @@
+commit.txt
+
 # Dependencies
 node_modules/
 
@@ -6,13 +8,13 @@ node_modules/
 .env.local
 .env.*.local
 
+# Cloudflare
+.wrangler/
+
 # Build output
 .next/
 dist/
 build/
-
-# Cloudflare
-.wrangler/
 
 # Logs
 *.log

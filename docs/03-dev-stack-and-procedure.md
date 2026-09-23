@@ -16,7 +16,7 @@ Short Link  →  scan.…/c/[slug]
 Redirect Service (looks up slug, logs scan event)
         │
         ▼
-Hub  →  matched clip  →  season ad  →  next step form
+Hub  →  matched clip (embedded from TikTok)  →  season ad  →  next-step form
         │
         ▼
 Follow Up (handoff via webhook or manual import)
@@ -25,7 +25,7 @@ Follow Up (handoff via webhook or manual import)
 Three components:
 
 1. **Redirect service** — owns the slug mapping, logs every scan, returns a 302 redirect.
-2. **Hub** — serves the matched clip, season ad, and next-step form.
+2. **Hub** — serves the matched clip (embedded from TikTok), the season ad, and the next-step form.
 3. **Handoff** — pushes form submissions to Follow Up.
 
 The QR code never encodes the final Hub URL. It encodes a short link on a domain we control. Destinations are editable without reprinting.
@@ -38,7 +38,7 @@ The QR code never encodes the final Hub URL. It encodes a short link on a domain
 | Redirect database | Cloudflare D1 | Bound directly to Worker; free tier generous for pilot |
 | Hub framework | Next.js (App Router) | SSR/SSG, SEO-friendly, mobile-first, Vercel free tier to start |
 | Hub CMS | Sanity (or Strapi 5) | Schema-as-code, editor-friendly, decouples content from code |
-| Video hosting | Mux (or Cloudflare Stream) | Don't self-host video; set cost alerts |
+| Video hosting | TikTok (embedded on Hub) | Free hosting; native short-form; algorithm as secondary channel |
 | Object storage | S3-compatible (Railway, Hetzner, or equivalent) | Source files and fallback delivery |
 | Hub database | Supabase (Postgres) | Free to start, scales, includes auth and row-level security |
 | Deployment | Vercel (Hub) + Cloudflare (redirect) | Fits each component's strength |
@@ -53,6 +53,7 @@ The QR code never encodes the final Hub URL. It encodes a short link on a domain
 | Third-party dynamic QR services | Free tiers have scan limits; redirects can stop; dependency risk |
 | Static QR codes | Encode final URL; break when Hub structure changes |
 | Self-hosted video | Bandwidth cost and complexity; not a differentiator |
+| Mux | Cost scales with viewing minutes; no distribution benefit. See ADR-015 |
 
 ## 4. Domain Strategy
 
@@ -111,7 +112,7 @@ The QR code never encodes the final Hub URL. It encodes a short link on a domain
 | `id` | uuid, primary key | |
 | `topic` | text | Matches slug topic |
 | `title` | text | Internal label |
-| `video_url` | text | Mux playback ID or URL |
+| `video_url` | text | TikTok video URL or ID |
 | `surface_codes` | text[] | Slugs this clip serves |
 | `active` | boolean | |
 
@@ -121,7 +122,7 @@ The QR code never encodes the final Hub URL. It encodes a short link on a domain
 |:---|:---|:---|
 | `id` | uuid, primary key | |
 | `title` | text | Internal label |
-| `video_url` | text | |
+| `video_url` | text | TikTok video URL or ID |
 | `invitation_copy` | text | Warm, specific |
 | `active_from` | timestamp | |
 | `active_until` | timestamp | |
@@ -159,14 +160,17 @@ The QR code never encodes the final Hub URL. It encodes a short link on a domain
 - One primary next step, one secondary. No other options.
 - No autoplay audio. Ever.
 - No pop-ups.
+- Clips are embedded from TikTok. Never redirect the user off-site to TikTok.
 
 ## 8. Video Hosting Procedure
 
-- Upload source clips and season ads to Mux (or Cloudflare Stream).
-- Store playback IDs in the `clips` and `season_ads` tables.
-- Hub embeds the player; it does not proxy video.
-- Set a monthly viewing-minute alert in Mux. If exceeded, review and cap.
-- Fallback: if Mux costs spike, switch to S3-compatible object storage with signed URLs. Experience degrades; cost drops.
+- Clips and season ads are uploaded to TikTok.
+- Each video has a stable URL. Store it in the `clips` or `season_ads` row as `video_url`.
+- The Hub embeds the video using TikTok's official embed player. It does not redirect to TikTok.
+- The Hub must never send a user off-site to watch a clip. This is a hard rule.
+- If TikTok's embed is unavailable, the Hub shows a fallback message and the season ad text. It does not break the page.
+- Analytics for views and completion come from TikTok's dashboard. Record these manually or via API into the pilot tracking sheet.
+- A fallback hosting option (object storage or another provider) should be identified but not built at pilot. See ADR-015.
 
 ## 9. Follow Up Handoff Procedure (MVP)
 
@@ -185,7 +189,7 @@ See `05-integration-contract-followup.md` for the precise field-level spec.
 - A Cloudflare account (Workers + D1)
 - A Vercel account
 - A Supabase project
-- A Mux account
+- A TikTok account for the project
 - Git access to the `soul-hub` repository
 
 **Local setup steps:**
@@ -201,8 +205,7 @@ See `05-integration-contract-followup.md` for the precise field-level spec.
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_KEY`
-- `MUX_TOKEN_ID`
-- `MUX_TOKEN_SECRET`
+- `TIKTOK_EMBED_BASE_URL` (if a base is used for constructing embeds)
 - `FALLBACK_URL`
 - `FOLLOWUP_WEBHOOK_URL`
 - `FOLLOWUP_API_KEY`
@@ -241,13 +244,14 @@ Never commit `.env` files.
 - Never store raw IP addresses. Hash before persisting.
 - Never return a 404 from a slug route. Always redirect to fallback.
 - Never autoplay audio on the Hub.
+- Never redirect a user off the Hub to TikTok. Clips are embedded, not linked out.
 - Never add a fifth field to the form without an explicit decision recorded in the Decision Log.
 
 ## 13. Testing and Validation
 
 - **Redirect:** given a known slug, returns 302 with the correct destination. Given an unknown slug, returns 302 to fallback.
 - **Scan logging:** every redirect writes exactly one scan event.
-- **Hub:** each topic page loads in under 3 seconds on a mobile connection; the correct clip is shown for the slug's topic.
+- **Hub:** each topic page loads in under 3 seconds on a mobile connection; the correct TikTok clip is embedded for the slug's topic; the page never redirects off-site to TikTok.
 - **Form:** submission writes a row; the handoff script picks it up within the scheduled window.
 - **Handoff:** a test submission reaches the Follow Up intake end to end.
 - **Season ad rotation:** changing the active season ad in the database changes what appears on the Hub without a redeploy.
@@ -261,7 +265,8 @@ Never commit `.env` files.
 - No 404s.
 
 **Hub:**
-- Topic pages serve the correct clip.
+- Topic pages serve the correct clip, embedded from TikTok.
+- No topic page redirects the user to TikTok.
 - Season ad rotates via database, not code.
 - Mobile-first layout verified on a real phone.
 - Load time under 3 seconds.
@@ -287,3 +292,15 @@ Never commit `.env` files.
 7. Print remaining pilot batch with production slugs.
 8. Monitor scan rate, clip completion, and next-step rate weekly.
 9. Review at end of pilot. Decide: expand, adjust, or stop.
+
+## 16. Pilot Mode Note
+
+The pilot is a demonstration for the ideators, not a permanent deployment. During this phase:
+
+- Use free platform domains: `*.workers.dev` for the redirect service and `*.vercel.app` for the Hub.
+- Do not purchase a domain.
+- Do not print physical material.
+- QR codes point to the Workers URL and redirect to the Vercel URL.
+- Test end to end on real phones.
+
+The rules in §4 (Domain Strategy) and ADR-003 apply when, and only when, the pilot is approved and physical material is about to be printed. Until then, free domains are sufficient and correct.
