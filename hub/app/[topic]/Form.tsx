@@ -47,9 +47,9 @@ export default function Form({
 
   if (submitted) {
     return (
-      <div className="p-4 border border-gray-200 rounded-lg">
-        <p className="text-base mb-1">Thank you.</p>
-        <p className="text-sm text-gray-500">
+      <div className="rounded-card border border-border bg-surface p-6 flex flex-col gap-2">
+        <p className="font-serif text-xl text-confirm">Thank you.</p>
+        <p className="text-sm text-text-secondary">
           Someone will reach out within 24 hours.
         </p>
       </div>
@@ -59,9 +59,16 @@ export default function Form({
   return (
     <form
       onSubmit={handleSubmit}
-      className="p-4 border border-gray-200 rounded-lg flex flex-col gap-3"
+      className="rounded-card border border-border bg-surface p-6 flex flex-col gap-4"
     >
-      <p className="text-base">Want someone to reach out?</p>
+      <div className="flex flex-col gap-1">
+        <p className="font-serif text-xl text-text-primary">
+          Want someone to reach out?
+        </p>
+        <p className="text-sm text-text-secondary">
+          No obligation. Just a conversation.
+        </p>
+      </div>
 
       <input
         type="text"
@@ -69,7 +76,7 @@ export default function Form({
         value={name}
         onChange={(e) => setName(e.target.value)}
         required
-        className="border border-gray-300 rounded px-3 py-2 text-sm"
+        className="rounded-control border border-border bg-background px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/15 transition"
       />
 
       <input
@@ -78,21 +85,21 @@ export default function Form({
         value={contact}
         onChange={(e) => setContact(e.target.value)}
         required
-        className="border border-gray-300 rounded px-3 py-2 text-sm"
+        className="rounded-control border border-border bg-background px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:border-accent focus:ring-2 focus:ring-accent/15 transition"
       />
 
       <button
         type="submit"
         disabled={submitting}
-        className="bg-gray-900 text-white rounded px-3 py-2 text-sm disabled:opacity-50"
+        className="rounded-control bg-accent px-4 py-3 text-sm text-white transition hover:bg-accent-hover disabled:opacity-50"
       >
-        {submitting ? 'Sending...' : 'Send'}
+        {submitting ? 'Sending…' : 'Send'}
       </button>
 
       {error && <p className="text-sm text-red-600">{error}</p>}
 
-      <p className="text-xs text-gray-400">
-        No obligation. We&apos;ll only contact you about what you watched.
+      <p className="text-xs text-text-secondary">
+        We&apos;ll only contact you about what you watched.
       </p>
     </form>
   )

@@ -40,13 +40,7 @@ export default {
 };
 
 function fallback() {
-  return new Response(
-    "<!doctype html><html><body><h1>Almost there</h1><p>This link isn't active right now. Please try again later.</p></body></html>",
-    {
-      status: 200,
-      headers: { "content-type": "text/html; charset=utf-8" },
-    }
-  );
+  return Response.redirect("https://qr-code-project-lilac.vercel.app/fallback", 302);
 }
 
 function detectDevice(ua) {

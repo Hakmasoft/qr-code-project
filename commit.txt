@@ -5,3 +5,6 @@ task: Hub live on Vercel with TikTok embed and working form
 - Form writes to Supabase form_submissions via anon key with RLS policies
 - Worker slug test-01 now redirects to the live Hub /peace page
 - Verified end-to-end: QR scan on mobile lands on Hub and form submits
+
+
+  'https://www.tiktok.com/@the.god.life/video/7672446946123975944?lang=en&q=The%20God%20Life&t=1790161856986'
