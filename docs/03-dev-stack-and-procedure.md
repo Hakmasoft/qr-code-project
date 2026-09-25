@@ -16,7 +16,7 @@ Short Link  →  scan.…/c/[slug]
 Redirect Service (looks up slug, logs scan event)
         │
         ▼
-Hub  →  matched clip (embedded from TikTok)  →  season ad  →  next-step form
+Hub  →  matched clip (embedded from YouTube)  →  season ad overlay  →  next-step form
         │
         ▼
 Follow Up (handoff via webhook or manual import)
@@ -38,7 +38,7 @@ The QR code never encodes the final Hub URL. It encodes a short link on a domain
 | Redirect database | Cloudflare D1 | Bound directly to Worker; free tier generous for pilot |
 | Hub framework | Next.js (App Router) | SSR/SSG, SEO-friendly, mobile-first, Vercel free tier to start |
 | Hub CMS | Sanity (or Strapi 5) | Schema-as-code, editor-friendly, decouples content from code |
-| Video hosting | TikTok (embedded on Hub) | Free hosting; native short-form; algorithm as secondary channel |
+| Video hosting | YouTube (embedded on Hub) | Free hosting; clean player; exposes `ENDED` event for the ad overlay |
 | Object storage | S3-compatible (Railway, Hetzner, or equivalent) | Source files and fallback delivery |
 | Hub database | Supabase (Postgres) | Free to start, scales, includes auth and row-level security |
 | Deployment | Vercel (Hub) + Cloudflare (redirect) | Fits each component's strength |
@@ -54,6 +54,7 @@ The QR code never encodes the final Hub URL. It encodes a short link on a domain
 | Static QR codes | Encode final URL; break when Hub structure changes |
 | Self-hosted video | Bandwidth cost and complexity; not a differentiator |
 | Mux | Cost scales with viewing minutes; no distribution benefit. See ADR-015 |
+| TikTok | Visual chrome fights the design; no `ENDED` event. See ADR-018 |
 
 ## 4. Domain Strategy
 
@@ -164,13 +165,15 @@ The QR code never encodes the final Hub URL. It encodes a short link on a domain
 
 ## 8. Video Hosting Procedure
 
-- Clips and season ads are uploaded to TikTok.
-- Each video has a stable URL. Store it in the `clips` or `season_ads` row as `video_url`.
-- The Hub embeds the video using TikTok's official embed player. It does not redirect to TikTok.
+- Clips and season ads are uploaded to YouTube.
+- Each video has a stable ID or URL. Store it in the `clips` or `season_ads` row as `video_url`.
+- The Hub embeds the video using the YouTube IFrame API. It does not redirect to YouTube.
 - The Hub must never send a user off-site to watch a clip. This is a hard rule.
-- If TikTok's embed is unavailable, the Hub shows a fallback message and the season ad text. It does not break the page.
-- Analytics for views and completion come from TikTok's dashboard. Record these manually or via API into the pilot tracking sheet.
-- A fallback hosting option (object storage or another provider) should be identified but not built at pilot. See ADR-015.
+- The player is configured with: `autoplay=1`, `mute=1`, `controls=0`, `modestbranding=1`, `rel=0`, `playsinline=1`.
+- The `onStateChange` event fires `ENDED` when the clip finishes. This triggers the season-ad overlay.
+- If YouTube's embed is unavailable, the Hub shows a fallback message and the season ad text. It does not break the page.
+- Analytics for views and completion come from YouTube Studio. Record these manually or via API into the pilot tracking sheet.
+- A fallback hosting option (Cloudflare Stream or another provider) should be identified but not built at pilot. See ADR-018.
 
 ## 9. Follow Up Handoff Procedure (MVP)
 
@@ -205,7 +208,7 @@ See `05-integration-contract-followup.md` for the precise field-level spec.
 - `SUPABASE_URL`
 - `SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_KEY`
-- `TIKTOK_EMBED_BASE_URL` (if a base is used for constructing embeds)
+- `YOUTUBE_VIDEO_ID` (for the pilot clip; or fetch from the database in later phases)
 - `FALLBACK_URL`
 - `FOLLOWUP_WEBHOOK_URL`
 - `FOLLOWUP_API_KEY`
@@ -251,7 +254,7 @@ Never commit `.env` files.
 
 - **Redirect:** given a known slug, returns 302 with the correct destination. Given an unknown slug, returns 302 to fallback.
 - **Scan logging:** every redirect writes exactly one scan event.
-- **Hub:** each topic page loads in under 3 seconds on a mobile connection; the correct TikTok clip is embedded for the slug's topic; the page never redirects off-site to TikTok.
+- **Hub:** each topic page loads in under 3 seconds on a mobile connection; the correct YouTube clip is embedded for the slug's topic; the page never redirects off-site to YouTube; the season-ad overlay appears when the video fires its `ENDED` event.
 - **Form:** submission writes a row; the handoff script picks it up within the scheduled window.
 - **Handoff:** a test submission reaches the Follow Up intake end to end.
 - **Season ad rotation:** changing the active season ad in the database changes what appears on the Hub without a redeploy.
@@ -265,8 +268,10 @@ Never commit `.env` files.
 - No 404s.
 
 **Hub:**
-- Topic pages serve the correct clip, embedded from TikTok.
-- No topic page redirects the user to TikTok.
+- Topic pages serve the correct clip, embedded from YouTube.
+- No topic page redirects the user to YouTube.
+- The season-ad overlay appears automatically when the clip ends.
+- The "Sound on" control unmutes the player.
 - Season ad rotates via database, not code.
 - Mobile-first layout verified on a real phone.
 - Load time under 3 seconds.

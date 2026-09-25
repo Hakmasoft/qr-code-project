@@ -46,7 +46,7 @@ soul-hub/
 | Hub | Next.js (App Router) |
 | Hub CMS | Sanity or Strapi 5 |
 | Hub database | Supabase (Postgres) |
-| Video hosting | TikTok (embedded on Hub) |
+| Video hosting | YouTube (embedded on Hub) |
 | Hub deployment | Vercel |
 | Redirect deployment | Wrangler |
 
@@ -98,7 +98,7 @@ These are non-negotiable. Violating any of them will break printed material, los
 8. Never delete a `slug` row while its surface may still be in circulation. Deactivate instead.
 9. Never change the handoff payload without updating the integration contract.
 10. Never commit `.env` files or secrets.
-11. Never redirect a user off the Hub to TikTok. Clips are embedded, not linked out.
+11. Never redirect a user off the Hub to YouTube. Clips are embedded, not linked out.
 
 ## Content Rules (Summary)
 

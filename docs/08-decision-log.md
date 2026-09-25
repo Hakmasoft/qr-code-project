@@ -233,7 +233,7 @@ Entries are newest-last. Superseded decisions keep their entry and reference the
 ### ADR-015 — Use TikTok for clip hosting, embedded on the Hub
 
 - **Date:** 2026-09-23
-- **Status:** Accepted
+- **Status:** Superseded by ADR-018
 - **Decision:** Clips and season ads are hosted on TikTok and embedded on the Hub via TikTok's embed player. The Hub remains the conversion point. Users are not redirected away from the Hub to TikTok.
 - **Context:** Mux bills per viewing minute, which is the single largest variable cost in the project. TikTok hosts short-form video for free, matches the content format natively, and can distribute clips through its algorithm as a secondary channel. The original Mux decision was made before the pilot's cost sensitivity was fully understood.
 - **Rationale:**
@@ -251,7 +251,7 @@ Entries are newest-last. Superseded decisions keep their entry and reference the
   - The project depends on TikTok's embed availability and terms; a fallback may be needed later
   - `clips.video_url` and `season_ads.video_url` store TikTok video IDs or URLs, not Mux playback IDs
   - Clip analytics come from TikTok, not from a Mux dashboard
-  - The Hub must embed, not redirect. This is a hard rule.
+  - The Hub must embed, not redirect. This is a hard rule. Superseded by ADR-018.
 
 ---
 
@@ -302,12 +302,41 @@ Entries are newest-last. Superseded decisions keep their entry and reference the
 
 ---
 
+### ADR-018 — Use YouTube for clip hosting, embedded on the Hub
+
+- **Date:** 2026-09-25
+- **Status:** Accepted
+- **Decision:** Clips are hosted on YouTube and embedded on the Hub using the YouTube IFrame API. The Hub remains the conversion point. Users are not redirected away from the Hub to YouTube.
+- **Context:** ADR-015 chose TikTok for free hosting and algorithmic reach. In practice, TikTok's embed imposed too much of its own branding and UI — "For You" prompts, app-directed CTAs, and a visual style that fought the calm, warm design of the Hub. TikTok's embed also does not expose a reliable "video ended" event, which the season-ad overlay depends on. YouTube provides a cleaner player, a proper `onStateChange` event with `ENDED`, and Phaneroo's clips are already hosted there.
+- **Rationale:**
+  - YouTube's IFrame API exposes `onStateChange`, which fires `ENDED` when the clip finishes — this is what makes the automatic season-ad overlay possible
+  - The player is far more controllable (`controls=0`, `modestbranding=1`, `rel=0`, `playsinline=1`)
+  - Phaneroo already has an existing library of clips on YouTube
+  - Cost remains zero at pilot scale
+- **Alternatives rejected:**
+  - TikTok — visual chrome fights the design, no `ENDED` event, weaker player control
+  - Mux — cost scales with viewing minutes; no distribution benefit
+  - Self-hosted video on GitHub — GitHub is not a CDN; repo bloat; terms-of-service risk
+  - Vimeo Free — 1 GB lifetime cap; works but adds a platform without advantage over YouTube
+  - Cloudflare Stream — viable paid option; deferred until the pilot proves the concept
+- **Consequences:**
+  - Video hosting cost remains zero at pilot scale
+  - The Hub depends on YouTube's embed availability and terms
+  - `clips.video_url` and `season_ads.video_url` store YouTube video IDs or URLs
+  - The Hub uses the YouTube IFrame API and loads `https://www.youtube.com/iframe_api`
+  - Clip analytics come from YouTube Studio
+  - The Hub must embed, not redirect. This is a hard rule.
+  - Migration to Cloudflare Stream or another host later is a one-line change per video
+
+---
+
 ## 4. Superseded and Reversed Decisions
 
 | ID | Status | Superseded by |
 |:---|:---|:---|
 | ADR-009 | Superseded | ADR-015 |
 | ADR-002 | Superseded | ADR-016 |
+| ADR-015 | Superseded | ADR-018 |
 
 ## 5. Proposed Decisions
 
