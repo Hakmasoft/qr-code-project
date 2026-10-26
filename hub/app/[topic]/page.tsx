@@ -12,7 +12,7 @@ declare global {
 
 const VIDEO_ID = '4c2BWPGeQ04'
 
-const surfaceLine = 'Are your past mistakes make you feel you don\'t deserve good? Listen!'
+const surfaceLine = 'Are your past mistakes making you feel you don\'t deserve good? Listen!'
 
 // Hardcoded for the pilot — shaped like a future Supabase `events` row
 // so this can be lifted into a real query later with minimal changes.
